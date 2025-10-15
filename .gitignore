@@ -1,0 +1,9 @@
+#ignore the node modules
+node_modules/
+
+#ignore .env 
+.env
+
+venv_whisper/
+
+venv/
