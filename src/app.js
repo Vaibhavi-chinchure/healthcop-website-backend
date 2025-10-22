@@ -76,7 +76,10 @@ app.use("/api/nurse-pre-employment", nursePreEmploymentRoutes);
 app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
-
+app.use('/attendance', attendanceRoutes);
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 // Global error middleware at the end
 app.use(errorMiddleware);
 
