@@ -1,13 +1,7 @@
-// const app = require("./app");
-// require("dotenv").config();
+import dotenv from "dotenv";
+import app from "./app.js";
 
-// const PORT = process.env.PORT || 5000;
-
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running at http://localhost:${PORT}`);
-// });
-require("dotenv").config();  // Load env first
-const app = require("./app");
+dotenv.config(); // Load .env first
 
 const PORT = process.env.PORT || 5000;
 
