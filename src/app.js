@@ -47,28 +47,49 @@ import nursePreEmploymentRoutes from "./routes/nursePreEmploymentRoute.js";
 import loginRoutes from "./routes/loginRoute.js";
 import siteRoutes from "./routes/siteRoutes.js";
 import PreEmploymentRoutes from "./routes/preEmploymentRoutes.js";
-
 import { fileURLToPath } from "url";
 
-// 🔧 __dirname replacement for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// ✅ Step 1: CORS Configuration (must be very early)
+const allowedOrigins = [
+  "https://healthcop-website.vercel.app",
+  "http://localhost:3000" // optional for local testing
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200); // ✅ Handle preflight
+  }
+  next();
+});
+
+// ✅ Optional: use cors() library for safety too
 app.use(cors({
-  origin: 'https://healthcop-website.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
+
+// ✅ Step 2: Standard Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve uploads folder
+// ✅ Step 3: Serve static files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// Mount routes
+// ✅ Step 4: Routes
 app.use("/api", routes);
 app.use("/api/doctor-nurse", doctorNurseRoutes);
 app.use("/api/auth", authRoutes);
@@ -78,7 +99,8 @@ app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
 
-// Global error middleware at the end
+// ✅ Step 5: Global error middleware
 app.use(errorMiddleware);
 
 export default app;
+
