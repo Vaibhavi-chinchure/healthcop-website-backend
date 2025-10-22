@@ -1,11 +1,15 @@
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
+const fs= require('.fs');
 const pool = mysql.createPool({
   host: '192.168.1.6',
   user: 'vaibhavi',
   password: '@Vaibhavi143',
   database: 'healthcop',
+  ssl:{
+  ca:FileSystem.readFileSync(process.env.CA)
+}
 });
 
 pool.getConnection()
