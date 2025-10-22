@@ -6,6 +6,9 @@ const pool = mysql.createPool({
   user: '3io6ZMytZpS2mdq.root',
   password: 'HDSNA0OluDsCXNWV',
   database: 'healthcop',
+   ssl: {
+    rejectUnauthorized: true
+  }
 });
 
 pool.getConnection()
