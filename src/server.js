@@ -1,16 +1,8 @@
-// const app = require("./app");
-// require("dotenv").config();
+import serverless from "serverless-http";  // or require('serverless-http') if using CommonJS
+import app from "./app.js";                // adjust path if needed
 
-// const PORT = process.env.PORT || 5000;
+// Wrap Express app as a Vercel Serverless Function
+export const handler = serverless(app);
 
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running at http://localhost:${PORT}`);
-// });
-require("dotenv").config();  // Load env first
-const app = require("./app");
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+// Optional default export (for local dev or testing)
+export default app;
