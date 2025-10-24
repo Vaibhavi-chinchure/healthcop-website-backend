@@ -10,11 +10,11 @@ const pool = mysql.createPool({
   user: '3io6ZMytZpS2mdq.root',
   password: 'HDSNA0OluDsCXNWV',
   database: 'healthcop',
-  // ssl: {
-  //   rejectUnauthorized: false,
-  //   ca: fs.readFileSync(process.env.CA),
-  //   servername: undefined
-  // }
+  ssl: {
+    rejectUnauthorized: false,
+    ca: fs.readFileSync(process.env.CA),
+    servername: undefined
+  }
 });
 
 pool.getConnection()
