@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import { getAllSitesHandler } from "../handlers/siteHandler.js";
+
 const router = express.Router();
-const { getAllSitesHandler } = require("../handlers/siteHandler");
 
 router.get("/sites", getAllSitesHandler);
 
-module.exports = router;
+export default router;

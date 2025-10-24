@@ -1,4 +1,4 @@
-const { getAllSitesService } = require("../services/siteService");
+import { getAllSitesService } from "../services/siteService.js";
 
 const getAllSitesHandler = async (req, res) => {
   try {
@@ -10,4 +10,4 @@ const getAllSitesHandler = async (req, res) => {
   }
 };
 
-module.exports = { getAllSitesHandler };
+export { getAllSitesHandler };

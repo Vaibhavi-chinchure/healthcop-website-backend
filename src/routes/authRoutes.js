@@ -1,19 +1,12 @@
-// const express = require("express");
-// const router = express.Router();
-// const authHandler = require("../handlers/authHandler");
+import express from "express";
+import { signup, login, resetPassword } from "../handlers/authHandler.js";
 
-// router.post("/signup", authHandler.signup);
-// router.post("/login", authHandler.login);
-
-// module.exports = router;
-const express = require("express");
 const router = express.Router();
-const authHandler = require("../handlers/authHandler");
 
-router.post("/signup", authHandler.signup);
-router.post("/login", authHandler.login);
+router.post("/signup", signup);
+router.post("/login", login);
 
 // 🔹 Add reset password route
-router.post("/reset-password", authHandler.resetPassword);
+router.post("/reset-password", resetPassword);
 
-module.exports = router;
+export default router;

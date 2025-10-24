@@ -1,12 +1,4 @@
-const express = require("express");
-const router = express.Router();
-const { getNurseRecordsBySite, updateNurseRecord } = require("../handlers/preEmploymentHandler");
-
-router.get("/site-records", getNurseRecordsBySite);
-router.put("/update/:id", updateNurseRecord);
-
-module.exports = router;
-const { getNurseRecordsBySiteService, updateNurseRecordService } = require("../services/preEmploymentServices");
+import { getNurseRecordsBySiteService, updateNurseRecordService } from "../services/preEmploymentServices.js";
 
 const getNurseRecordsBySite = async (req, res) => {
   try {
@@ -35,4 +27,4 @@ const updateNurseRecord = async (req, res) => {
   }
 };
 
-module.exports = { getNurseRecordsBySite, updateNurseRecord };
+export { getNurseRecordsBySite, updateNurseRecord };

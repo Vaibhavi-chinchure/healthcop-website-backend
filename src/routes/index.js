@@ -1,10 +1,9 @@
-// routes/index.js
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import authRoutes from "./authRoutes.js";
 
-const authRoutes = require("./authRoutes");
+const router = express.Router();
 
 // mount them
 router.use("/", authRoutes);
 
-module.exports = router;
+export default router;

@@ -57,11 +57,15 @@
 //     next(err);
 //   }
 // };
-const doctorNurseService = require("../services/doctorNurseService");
-const fs = require("fs").promises;
-const path = require("path");
+import { addDoctorNurse as addDoctorNurseService, getAllDoctorNurse as getAllDoctorNurseService, getDoctorNurseById as getDoctorNurseByIdService, updateDoctorNurse as updateDoctorNurseService } from "../services/doctorNurseService.js";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
-exports.addDoctorNurse = async (req, res, next) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const addDoctorNurse = async (req, res, next) => {
   try {
     console.log("req.body (text fields):", req.body);
     console.log("req.files:", req.files);
@@ -82,7 +86,7 @@ exports.addDoctorNurse = async (req, res, next) => {
       return res.status(400).json({ message: "Missing required text fields: role, name, email" });
     }
 
-    const result = await doctorNurseService.addDoctorNurse(data);
+    const result = await addDoctorNurseService(data);
     res.status(201).json(result);
   } catch (err) {
     console.error("Handler error:", err);
@@ -90,31 +94,31 @@ exports.addDoctorNurse = async (req, res, next) => {
   }
 };
 
-exports.getAllDoctorNurse = async (req, res, next) => {
+export const getAllDoctorNurse = async (req, res, next) => {
   try {
-    const result = await doctorNurseService.getAllDoctorNurse();
+    const result = await getAllDoctorNurseService();
     res.status(200).json(result);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getDoctorNurseById = async (req, res, next) => {
+export const getDoctorNurseById = async (req, res, next) => {
   try {
-    const result = await doctorNurseService.getDoctorNurseById(req.params.id);
+    const result = await getDoctorNurseByIdService(req.params.id);
     res.status(200).json(result);
   } catch (err) {
     next(err);
   }
 };
 
-exports.updateDoctorNurse = async (req, res, next) => {
+export const updateDoctorNurse = async (req, res, next) => {
   try {
     console.log("req.body (text fields):", req.body);
     console.log("req.files:", req.files);
 
     // Fetch existing record to get current file paths
-    const existingRecord = await doctorNurseService.getDoctorNurseById(req.params.id);
+    const existingRecord = await getDoctorNurseByIdService(req.params.id);
 
     const data = {
       ...req.body,
@@ -141,7 +145,7 @@ exports.updateDoctorNurse = async (req, res, next) => {
       }
     }
 
-    const result = await doctorNurseService.updateDoctorNurse(req.params.id, data);
+    const result = await updateDoctorNurseService(req.params.id, data);
     res.status(200).json(result);
   } catch (err) {
     console.error("Handler error:", err);

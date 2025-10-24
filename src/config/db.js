@@ -1,5 +1,8 @@
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+import fs from "fs";
+
+dotenv.config();
 
 const fs= require('fs');
 const pool = mysql.createPool({
@@ -7,9 +10,10 @@ const pool = mysql.createPool({
   user: '3io6ZMytZpS2mdq.root',
   password: 'HDSNA0OluDsCXNWV',
   database: 'healthcop',
- ssl: {
+  ssl: {
     rejectUnauthorized: false,
-    ca: fs.readFileSync(process.env.CA)
+    ca: fs.readFileSync(process.env.CA),
+    servername: undefined
   }
 });
 
@@ -22,4 +26,4 @@ pool.getConnection()
     console.error("Database connection failed:", err.message);
   });
 
-module.exports = pool;
+export default pool;

@@ -4,4 +4,4 @@ const GET_ALL_SITES = `
   ORDER BY site_name ASC;
 `;
 
-module.exports = { GET_ALL_SITES };
+export { GET_ALL_SITES };

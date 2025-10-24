@@ -1,6 +1,6 @@
-const { getUserDetailsByEmailService } = require("../services/loginService");
+import { getUserDetailsByEmailService } from "../services/loginService.js";
 
-const getUserDetailsByEmailHandler = async (req, res) => {
+export const getUserDetailsByEmailHandler = async (req, res) => {
   try {
     const { email } = req.query;
 
@@ -20,5 +20,3 @@ const getUserDetailsByEmailHandler = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-module.exports = { getUserDetailsByEmailHandler };
