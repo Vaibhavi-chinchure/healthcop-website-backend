@@ -1,6 +1,5 @@
 import { getNurseRecordsBySiteService, updateNurseRecordService } from "../services/preEmploymentServices.js";
 
-// GET - fetch all nurse pre-employment records for a specific site
 const getNurseRecordsBySite = async (req, res) => {
   try {
     const { site_id } = req.query;
@@ -15,14 +14,11 @@ const getNurseRecordsBySite = async (req, res) => {
   }
 };
 
-// PUT - update a nurse pre-employment record by id
 const updateNurseRecord = async (req, res) => {
   try {
     const { id } = req.params;
     const recordData = req.body;
-
     if (!id) return res.status(400).json({ message: "Record ID is required" });
-
     await updateNurseRecordService(id, recordData);
     res.status(200).json({ message: "Record updated successfully" });
   } catch (error) {

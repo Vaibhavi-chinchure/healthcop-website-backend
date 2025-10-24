@@ -1,7 +1,5 @@
 const GET_NURSE_RECORDS_BY_SITE = `
-  SELECT *
-  FROM healthcop.nurse_pre_employment
-  WHERE site_id = ?;
+  SELECT * FROM healthcop.nurse_pre_employment WHERE site_id = ?;
 `;
 
 const UPDATE_NURSE_RECORD = `

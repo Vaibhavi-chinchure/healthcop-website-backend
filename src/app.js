@@ -65,10 +65,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve uploads folder
+// ✅ Step 3: Serve static files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// Mount routes
+// ✅ Step 4: Routes
 app.use("/api", routes);
 app.use("/api/doctor-nurse", doctorNurseRoutes);
 app.use("/api/auth", authRoutes);
@@ -78,7 +78,7 @@ app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
 
-// Global error middleware at the end
+// ✅ Step 5: Global error middleware
 app.use(errorMiddleware);
 
 export default app;
