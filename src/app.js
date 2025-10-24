@@ -98,6 +98,9 @@ app.use("/api/nurse-pre-employment", nursePreEmploymentRoutes);
 app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully 🚀");
+});
 
 // ✅ Step 5: Global error middleware
 app.use(errorMiddleware);
