@@ -1,20 +1,5 @@
-// const db = require("../config/db");
-// const { GET_NURSE_RECORDS_BY_SITE } = require("../constants/preEmploymentQueries");
-
-// const getNurseRecordsBySiteService = async (site_id) => {
-//   try {
-//     const [rows] = await db.query(GET_NURSE_RECORDS_BY_SITE, [site_id]);
-//     return rows;
-//   } catch (error) {
-//     console.error("Service Error:", error);
-//     throw error;
-//   }
-// };
-
-// module.exports = { getNurseRecordsBySiteService };
-
-const db = require("../config/db");
-const { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD } = require("../constants/preEmploymentQueries");
+import db from "../config/db.js";
+import { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD } from "../constants/preEmploymentQueries.js";
 
 const getNurseRecordsBySiteService = async (site_id) => {
   try {
@@ -87,4 +72,4 @@ const updateNurseRecordService = async (id, recordData) => {
   }
 };
 
-module.exports = { getNurseRecordsBySiteService, updateNurseRecordService };
+export { getNurseRecordsBySiteService, updateNurseRecordService };

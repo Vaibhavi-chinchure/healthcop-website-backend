@@ -1,12 +1,14 @@
 
-const pool = require("../config/db");
-const queries = require("../constants/doctorNurseQueries");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+import pool from "../config/db.js";
+import queries from "../constants/doctorNurseQueries.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
-exports.addDoctorNurse = async (data) => {
+dotenv.config();
+
+const addDoctorNurse = async (data) => {
   const {
     role,
     name,
@@ -173,18 +175,18 @@ exports.addDoctorNurse = async (data) => {
   }
 };
 
-exports.getAllDoctorNurse = async () => {
+const getAllDoctorNurse = async () => {
   const [rows] = await pool.query(queries.GET_ALL_DOCTOR_NURSE);
   return rows;
 };
 
-exports.getDoctorNurseById = async (id) => {
+const getDoctorNurseById = async (id) => {
   const [rows] = await pool.query(queries.GET_DOCTOR_NURSE_BY_ID, [id]);
   if (rows.length === 0) throw new Error("Doctor/Nurse not found");
   return rows[0];
 };
 
-exports.updateDoctorNurse = async (id, data) => {
+const updateDoctorNurse = async (id, data) => {
   const {
     role,
     name,
@@ -234,3 +236,5 @@ exports.updateDoctorNurse = async (id, data) => {
 
   return { message: "Doctor/Nurse updated successfully", affectedRows: result.affectedRows };
 };
+
+export { addDoctorNurse, getAllDoctorNurse, getDoctorNurseById, updateDoctorNurse };

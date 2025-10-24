@@ -162,17 +162,19 @@
 ////<-------------------save working code above--------------------->
 
 
-const express = require("express");
-const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const authMiddleware = require("../middlewares/authMiddleware");
-const { addPreEmployment, getAllPreEmployment, getPreEmploymentById, updatePreEmployment, deletePreEmployment } = require("../handlers/nursePreEmploymentHandle");  // ✅ Fixed: added 'r'
+import express from "express";
+import multer from "multer";
+import path from "path";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import { addPreEmployment, getAllPreEmployment, getPreEmploymentById, updatePreEmployment, deletePreEmployment } from "../handlers/nursePreEmploymentHandle.js";
 // ✅ Configure multer storage
+import fs from "fs";
+
+const router = express.Router();
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Ensure the uploads directory exists
-    const fs = require('fs');
     const dir = 'uploads/nurse_preemployment';
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -227,7 +229,7 @@ router.get("/:id", authMiddleware(["admin", "nurse", "doctor"]), getPreEmploymen
 // ✅ Generate PDF for a specific record
 router.get("/:id/pdf", authMiddleware(["admin", "nurse", "doctor"]), async (req, res) => {
   try {
-    const { generatePDF } = require("../handlers/nursePreEmploymentHandle.js");
+    const { generatePDF } = await import("../handlers/nursePreEmploymentHandle.js");
     await generatePDF(req, res);
   } catch (error) {
     console.error("PDF generation error:", error);
@@ -249,4 +251,4 @@ router.put(
 // ✅ Delete record by ID
 router.delete("/:id", authMiddleware(["admin", "nurse", "doctor"]), deletePreEmployment);
 
-module.exports = router;
+export default router;

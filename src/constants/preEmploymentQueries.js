@@ -1,12 +1,3 @@
-// const GET_NURSE_RECORDS_BY_SITE = `
-//   SELECT *
-//   FROM healthcop.nurse_pre_employment
-//   WHERE site_id = ?;
-// `;
-
-// module.exports = { GET_NURSE_RECORDS_BY_SITE };
-
-
 const GET_NURSE_RECORDS_BY_SITE = `
   SELECT *
   FROM healthcop.nurse_pre_employment
@@ -15,7 +6,7 @@ const GET_NURSE_RECORDS_BY_SITE = `
 
 const UPDATE_NURSE_RECORD = `
   UPDATE healthcop.nurse_pre_employment
-  SET 
+  SET
     laborer_id = ?,
     created_by = ?,
     name = ?,
@@ -65,4 +56,4 @@ const UPDATE_NURSE_RECORD = `
   WHERE id = ?;
 `;
 
-module.exports = { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD };
+export { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD };

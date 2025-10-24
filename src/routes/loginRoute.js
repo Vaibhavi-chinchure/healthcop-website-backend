@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import { getUserDetailsByEmailHandler } from "../handlers/loginHandler.js";
+
 const router = express.Router();
-const loginHandler = require("../handlers/loginHandler");
 
 // GET - fetch user details by email
-router.get("/user", loginHandler.getUserDetailsByEmailHandler);
+router.get("/user", getUserDetailsByEmailHandler);
 
-module.exports = router;
+export default router;

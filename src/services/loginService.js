@@ -1,7 +1,7 @@
-const db = require("../config/db");
-const { GET_USER_DETAILS_BY_EMAIL } = require("../constants/loginQueries");
+import db from "../config/db.js";
+import { GET_USER_DETAILS_BY_EMAIL } from "../constants/loginQueries.js";
 
-const getUserDetailsByEmailService = async (email) => {
+export const getUserDetailsByEmailService = async (email) => {
   try {
     const [rows] = await db.query(GET_USER_DETAILS_BY_EMAIL, [email]);
     return rows.length ? rows[0] : null;
@@ -9,5 +9,3 @@ const getUserDetailsByEmailService = async (email) => {
     throw error;
   }
 };
-
-module.exports = { getUserDetailsByEmailService };

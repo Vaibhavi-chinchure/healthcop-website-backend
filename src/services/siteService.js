@@ -1,5 +1,5 @@
-const db = require("../config/db");
-const { GET_ALL_SITES } = require("../constants/siteQueries");
+import db from "../config/db.js";
+import { GET_ALL_SITES } from "../constants/siteQueries.js";
 
 const getAllSitesService = async () => {
   try {
@@ -10,4 +10,4 @@ const getAllSitesService = async () => {
   }
 };
 
-module.exports = { getAllSitesService };
+export { getAllSitesService };

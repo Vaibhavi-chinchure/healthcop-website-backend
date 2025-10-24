@@ -104,12 +104,13 @@
 
 // module.exports = router;
 
-const express = require("express");
+import express from "express";
+import multer from "multer";
+import { addDoctorNurse, getAllDoctorNurse, getDoctorNurseById, updateDoctorNurse } from "../handlers/doctorNurseHandler.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import path from "path";
+
 const router = express.Router();
-const multer = require("multer");
-const doctorNurseHandler = require("../handlers/doctorNurseHandler");
-const authMiddleware = require("../middlewares/authMiddleware");
-const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -147,11 +148,11 @@ router.post(
     { name: "cancelledCheque", maxCount: 1 },
     { name: "declaration", maxCount: 1 },
   ]),
-  doctorNurseHandler.addDoctorNurse
+  addDoctorNurse
 );
 
-router.get("/", authMiddleware("admin"), doctorNurseHandler.getAllDoctorNurse);
-router.get("/:id", authMiddleware("admin"), doctorNurseHandler.getDoctorNurseById);
+router.get("/", authMiddleware("admin"), getAllDoctorNurse);
+router.get("/:id", authMiddleware("admin"), getDoctorNurseById);
 router.put(
   "/:id",
   authMiddleware("admin"),
@@ -164,7 +165,7 @@ router.put(
     { name: "cancelledCheque", maxCount: 1 },
     { name: "declaration", maxCount: 1 },
   ]),
-  doctorNurseHandler.updateDoctorNurse
+  updateDoctorNurse
 );
 
-module.exports = router;
+export default router;

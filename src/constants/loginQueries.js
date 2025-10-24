@@ -1,5 +1,5 @@
-const GET_USER_DETAILS_BY_EMAIL = `
-  SELECT 
+export const GET_USER_DETAILS_BY_EMAIL = `
+  SELECT
     d.USRID,
     d.role,
     d.name,
@@ -21,9 +21,7 @@ const GET_USER_DETAILS_BY_EMAIL = `
     d.status,
     d.created_at
   FROM healthcop.doctor_nurse d
-  INNER JOIN healthcop.hop_users u 
+  INNER JOIN healthcop.hop_users u
     ON d.email = u.email
   WHERE d.email = ?;
 `;
-
-module.exports = { GET_USER_DETAILS_BY_EMAIL };

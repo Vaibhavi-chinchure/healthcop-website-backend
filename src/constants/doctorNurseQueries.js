@@ -1,10 +1,10 @@
 
 
 
-module.exports = {
+export default {
   INSERT_DOCTOR_NURSE: `
-    INSERT INTO doctor_nurse 
-    (USRID, role, name, email, mobile, dob, age, residence, maritalStatus, degreeName, yearOfPassing, 
+    INSERT INTO doctor_nurse
+    (USRID, role, name, email, mobile, dob, age, residence, maritalStatus, degreeName, yearOfPassing,
      photo, signature, degreeCertificate, aadharCard, panCard, cancelledCheque, declaration, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
@@ -16,8 +16,8 @@ module.exports = {
   `,
   UPDATE_DOCTOR_NURSE: `
     UPDATE doctor_nurse
-    SET role = ?, name = ?, email = ?, mobile = ?, dob = ?, age = ?, residence = ?, 
-        maritalStatus = ?, degreeName = ?, yearOfPassing = ?, photo = ?, signature = ?, 
+    SET role = ?, name = ?, email = ?, mobile = ?, dob = ?, age = ?, residence = ?,
+        maritalStatus = ?, degreeName = ?, yearOfPassing = ?, photo = ?, signature = ?,
         degreeCertificate = ?, aadharCard = ?, panCard = ?, cancelledCheque = ?, declaration = ?, status = ?
     WHERE USRID = ?
   `
