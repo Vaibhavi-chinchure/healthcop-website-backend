@@ -1,7 +1,10 @@
-import { getNurseRecordsBySiteService, updateNurseRecordService } from "../services/preEmploymentServices.js";
+const {
+  getNurseRecordsBySiteService,
+  updateNurseRecordService
+} = require("../services/preEmploymentServices");
 
 // GET - fetch all nurse pre-employment records for a specific site
-export const getNurseRecordsBySite = async (req, res) => {
+const getNurseRecordsBySite = async (req, res) => {
   try {
     const { site_id } = req.query;
     if (!site_id) {
@@ -16,7 +19,7 @@ export const getNurseRecordsBySite = async (req, res) => {
 };
 
 // PUT - update a nurse pre-employment record by id
-export const updateNurseRecord = async (req, res) => {
+const updateNurseRecord = async (req, res) => {
   try {
     const { id } = req.params;
     const recordData = req.body;
@@ -29,4 +32,9 @@ export const updateNurseRecord = async (req, res) => {
     console.error("Update Handler Error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
+};
+
+module.exports = {
+  getNurseRecordsBySite,
+  updateNurseRecord
 };
