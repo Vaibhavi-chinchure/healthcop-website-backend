@@ -1,27 +1,7 @@
-// const { getNurseRecordsBySiteService } = require("../services/preEmploymentServices");
-
-// const getNurseRecordsBySite = async (req, res) => {
-//   try {
-//     const { site_id } = req.query;
-
-//     if (!site_id) {
-//       return res.status(400).json({ message: "Site ID is required" });
-//     }
-
-//     const records = await getNurseRecordsBySiteService(site_id);
-//     res.status(200).json(records);
-//   } catch (error) {
-//     console.error("Handler Error:", error);
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
-
-// module.exports = { getNurseRecordsBySite };
-
-const { getNurseRecordsBySiteService, updateNurseRecordService } = require("../services/preEmploymentServices");
+import { getNurseRecordsBySiteService, updateNurseRecordService } from "../services/preEmploymentServices.js";
 
 // GET - fetch all nurse pre-employment records for a specific site
-const getNurseRecordsBySite = async (req, res) => {
+export const getNurseRecordsBySite = async (req, res) => {
   try {
     const { site_id } = req.query;
     if (!site_id) {
@@ -36,7 +16,7 @@ const getNurseRecordsBySite = async (req, res) => {
 };
 
 // PUT - update a nurse pre-employment record by id
-const updateNurseRecord = async (req, res) => {
+export const updateNurseRecord = async (req, res) => {
   try {
     const { id } = req.params;
     const recordData = req.body;
@@ -50,5 +30,3 @@ const updateNurseRecord = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-module.exports = { getNurseRecordsBySite, updateNurseRecord };
