@@ -1,12 +1,8 @@
-import express from "express";
-import { getNurseRecordsBySite, updateNurseRecord } from "../handlers/preEmploymentHandler.js";
-
+const express = require("express");
 const router = express.Router();
+const { getNurseRecordsBySite, updateNurseRecord } = require("../handlers/preEmploymentHandler");
 
-// GET - fetch all nurse pre-employment records for a specific site
 router.get("/site-records", getNurseRecordsBySite);
-
-// PUT - update a record by id
 router.put("/update/:id", updateNurseRecord);
 
-export default router;
+module.exports = router;
