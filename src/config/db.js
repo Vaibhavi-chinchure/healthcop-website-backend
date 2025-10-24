@@ -5,25 +5,24 @@ import fs from "fs";
 dotenv.config();
 
 const pool = mysql.createPool({
-  host: 'gateway01.ap-northeast-1.prod.aws.tidbcloud.com',
-  user: '3io6ZMytZpS2mdq.root',
-  password: 'HDSNA0OluDsCXNWV',
-  database: 'healthcop',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   ssl: process.env.CA
     ? {
         rejectUnauthorized: false,
         ca: fs.readFileSync(process.env.CA),
-        servername: undefined,
       }
     : { rejectUnauthorized: false },
 });
 
 pool.getConnection()
-  .then(connection => {
+  .then((connection) => {
     console.log("✅ Database connected successfully");
     connection.release();
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("❌ Database connection failed:", err.message);
   });
 
