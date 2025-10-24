@@ -1,7 +1,7 @@
-import db from "../config/db.js";
-import { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD } from "../constants/preEmploymentQueries.js";
+const db = require("../config/db");
+const { GET_NURSE_RECORDS_BY_SITE, UPDATE_NURSE_RECORD } = require("../constants/preEmploymentQueries");
 
-export const getNurseRecordsBySiteService = async (site_id) => {
+const getNurseRecordsBySiteService = async (site_id) => {
   try {
     const [rows] = await db.query(GET_NURSE_RECORDS_BY_SITE, [site_id]);
     return rows;
@@ -11,8 +11,7 @@ export const getNurseRecordsBySiteService = async (site_id) => {
   }
 };
 
-// Update record service
-export const updateNurseRecordService = async (id, recordData) => {
+const updateNurseRecordService = async (id, recordData) => {
   try {
     const values = [
       recordData.laborer_id,
@@ -70,4 +69,9 @@ export const updateNurseRecordService = async (id, recordData) => {
     console.error("Update Service Error:", error);
     throw error;
   }
+};
+
+module.exports = {
+  getNurseRecordsBySiteService,
+  updateNurseRecordService
 };
