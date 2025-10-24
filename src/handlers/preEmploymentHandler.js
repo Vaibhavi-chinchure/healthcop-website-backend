@@ -1,9 +1,13 @@
-const {
-  getNurseRecordsBySiteService,
-  updateNurseRecordService
-} = require("../services/preEmploymentServices");
+const express = require("express");
+const router = express.Router();
+const { getNurseRecordsBySite, updateNurseRecord } = require("../handlers/preEmploymentHandler");
 
-// GET - fetch all nurse pre-employment records for a specific site
+router.get("/site-records", getNurseRecordsBySite);
+router.put("/update/:id", updateNurseRecord);
+
+module.exports = router;
+const { getNurseRecordsBySiteService, updateNurseRecordService } = require("../services/preEmploymentServices");
+
 const getNurseRecordsBySite = async (req, res) => {
   try {
     const { site_id } = req.query;
@@ -18,14 +22,11 @@ const getNurseRecordsBySite = async (req, res) => {
   }
 };
 
-// PUT - update a nurse pre-employment record by id
 const updateNurseRecord = async (req, res) => {
   try {
     const { id } = req.params;
     const recordData = req.body;
-
     if (!id) return res.status(400).json({ message: "Record ID is required" });
-
     await updateNurseRecordService(id, recordData);
     res.status(200).json({ message: "Record updated successfully" });
   } catch (error) {
@@ -34,7 +35,4 @@ const updateNurseRecord = async (req, res) => {
   }
 };
 
-module.exports = {
-  getNurseRecordsBySite,
-  updateNurseRecord
-};
+module.exports = { getNurseRecordsBySite, updateNurseRecord };
