@@ -77,6 +77,9 @@ app.use("/api/nurse-pre-employment", nursePreEmploymentRoutes);
 app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is healthy ✅" });
+});
 
 // ✅ Step 5: Global error middleware
 app.use(errorMiddleware);
