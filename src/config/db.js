@@ -11,10 +11,10 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   ssl: process.env.CA
     ? {
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
         ca: fs.readFileSync(process.env.CA),
       }
-    : { rejectUnauthorized: false },
+    : { rejectUnauthorized: true },
 });
 
 pool.getConnection()
