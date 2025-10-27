@@ -34,6 +34,8 @@
 // app.use(errorMiddleware);
 
 // module.exports = app;
+
+
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -47,7 +49,7 @@ import nursePreEmploymentRoutes from "./routes/nursePreEmploymentRoute.js";
 import loginRoutes from "./routes/loginRoute.js";
 import siteRoutes from "./routes/siteRoutes.js";
 import PreEmploymentRoutes from "./routes/preEmploymentRoutes.js";
-
+import attendanceRoutes from "./routes/attendanceRoutes.js";
 import { fileURLToPath } from "url";
 
 // 🔧 __dirname replacement for ES modules
@@ -56,11 +58,28 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true
-}));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://healthcop-website.vercel.app",
+  "https://healthcop-website-frontend.onrender.com"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -77,7 +96,7 @@ app.use("/api/nurse-pre-employment", nursePreEmploymentRoutes);
 app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
-
+app.use("/attendance", attendanceRoutes);
 // Global error middleware at the end
 app.use(errorMiddleware);
 
