@@ -1,12 +1,18 @@
-
 import pool from "../config/db.js";
 import queries from "../constants/doctorNurseQueries.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+// Debug environment variables
+console.log('SENDGRID_API_KEY (masked):', process.env.SENDGRID_API_KEY ? `${process.env.SENDGRID_API_KEY.substring(0, 5)}...` : 'MISSING');
+console.log('FROM_EMAIL:', process.env.FROM_EMAIL || 'MISSING');
+
+// Set SendGrid API key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const addDoctorNurse = async (data) => {
   const {
@@ -54,13 +60,13 @@ const addDoctorNurse = async (data) => {
       );
       let newIdNumber = 1;
       if (lastRecord.length > 0 && lastRecord[0].USRID) {
-        const lastId = lastRecord[0].USRID; // e.g., "HOP-DOC-0001"
-        const lastNumber = parseInt(lastId.split("-")[2], 10); // Extract number part
+        const lastId = lastRecord[0].USRID;
+        const lastNumber = parseInt(lastId.split("-")[2], 10);
         if (!isNaN(lastNumber)) {
           newIdNumber = lastNumber + 1;
         }
       }
-      newUSRID = `HOP-${rolePrefix}-${newIdNumber.toString().padStart(4, "0")}`; // e.g., "HOP-DOC-0001"
+      newUSRID = `HOP-${rolePrefix}-${newIdNumber.toString().padStart(4, "0")}`;
     } catch (err) {
       console.error("Error generating USRID:", err.message);
       throw new Error("Failed to generate USRID");
@@ -120,53 +126,44 @@ const addDoctorNurse = async (data) => {
       expiresIn: "1h",
     });
 
-    // Send reset email via Nodemailer + Gmail SMTP
+    // Send reset email via SendGrid
     const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
-
-    // Debug: Log credentials (masked for security)
-    console.log("Attempting email send to:", email);
-    console.log("Gmail User (masked):", process.env.GMAIL_USER ? `${process.env.GMAIL_USER.substring(0, 3)}...` : "MISSING");
-    console.log("Gmail Pass Length:", process.env.GMAIL_PASS ? `${process.env.GMAIL_PASS.length} chars` : "MISSING");
-
-    const mailOptions = {
-      from: `"HealthCop Team" <${process.env.GMAIL_USER}>`,
+    const msg = {
       to: email,
+      from: process.env.FROM_EMAIL, // Verified sender email
       subject: "Reset Your Password - HealthCop Account Created",
       html: `
         <h2>Password Reset Request</h2>
         <p>Hello ${name},</p>
-        <p>Your HealthCop account has been created successfully. Your User ID is <strong>${newUSRID}</strong>. Please set your password by clicking the link below:</p>
+        <p>Your HealthCop account has been created successfully. Your User ID is <strong>${newUSRID}</strong>.</p>
+        <p>Please set your password by clicking the link below:</p>
         <a href="${resetLink}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+        <p>Temporary Password (for reference, do not use directly): <strong>${tempPassword}</strong></p>
         <p>This link expires in 1 hour. If you didn't request this, please ignore this email.</p>
-        <p>Best regards,<br>Sukalpa Tech Solutions Pvt. Ltd.</p>
+        <p>Best regards,<br>HealthCop Pvt. Ltd.</p>
       `,
     };
 
     // Send email
     try {
-      await transporter.sendMail(mailOptions);
+      await sgMail.send(msg);
       console.log(`✅ Reset email sent successfully to ${email}`);
     } catch (emailErr) {
-      console.error(`❌ Email sending failed for ${email}:`, emailErr.message);
+      console.error(`❌ Email sending failed for ${email}:`, emailErr.response ? emailErr.response.body : emailErr.message);
       console.log(`🔑 Temp password for ${email} (share manually): ${tempPassword}`);
+      // Return the temp password in case email fails
+      return { message: "Doctor/Nurse added successfully, but email sending failed", id: newUSRID, tempPassword };
     }
 
     // Fetch full doctor_nurse record
     const [rows] = await connection.query(queries.GET_DOCTOR_NURSE_BY_ID, [newUSRID]);
-    return rows[0] || { message: "Doctor/Nurse added successfully", id: newUSRID };
+    return { ...rows[0], tempPassword }; // Include tempPassword in response
   } catch (err) {
     // Rollback transaction on error
     await connection.rollback();
     // Rollback hop_users insert if it was created
-    if (err.userId) {
-      await connection.query(`DELETE FROM hop_users WHERE id = ?`, [err.userId]);
+    if (userResult?.insertId) {
+      await connection.query(`DELETE FROM hop_users WHERE id = ?`, [userResult.insertId]);
     }
     console.error("Error in addDoctorNurse:", err.message);
     throw err;
