@@ -84,7 +84,9 @@
 // // ✅ Step 5: Global error middleware
 // app.use(errorMiddleware);
 
-// export default app;
+// module.exports = app;
+
+
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -98,6 +100,7 @@ import nursePreEmploymentRoutes from "./routes/nursePreEmploymentRoute.js";
 import loginRoutes from "./routes/loginRoute.js";
 import siteRoutes from "./routes/siteRoutes.js";
 import PreEmploymentRoutes from "./routes/preEmploymentRoutes.js";
+import attendanceRoutes from "./routes/attendanceRoutes.js";
 import { fileURLToPath } from "url";
 
 // 🔧 __dirname replacement for ES modules
@@ -106,7 +109,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// ✅ Step 1: Configure CORS for multiple allowed origins
 const allowedOrigins = [
   "http://localhost:3000",
   "https://healthcop-website.vercel.app",
@@ -119,9 +121,9 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+        callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -145,13 +147,8 @@ app.use("/api/nurse-pre-employment", nursePreEmploymentRoutes);
 app.use("/api", loginRoutes);
 app.use("/api", siteRoutes);
 app.use("/api/pre-employment", PreEmploymentRoutes);
-
-// ✅ Step 4: Health check route for Render
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Server is healthy ✅" });
-});
-
-// ✅ Step 5: Global error middleware
+app.use("/attendance", attendanceRoutes);
+// Global error middleware at the end
 app.use(errorMiddleware);
 
 export default app;

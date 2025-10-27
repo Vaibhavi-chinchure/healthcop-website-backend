@@ -1,8 +1,7 @@
-// services/attendanceService.js
-const pool = require('../config/db');
-const Q = require('../constants/attendanceQueries');
+import pool from "../config/db.js";
+import Q from "../constants/attendanceQueries.js";
 
-async function createLogin({ user_id, site_id, site_name, login_time, login_location, device_name }) {
+export async function createLogin({ user_id, site_id, site_name, login_time, login_location, device_name }) {
   const conn = await pool.getConnection();
   try {
     const [result] = await conn.execute(Q.INSERT_LOGIN, [
@@ -11,7 +10,7 @@ async function createLogin({ user_id, site_id, site_name, login_time, login_loca
       site_name || null,
       login_time,
       login_location || null,
-      device_name || null
+      device_name || null,
     ]);
     return { insertId: result.insertId };
   } finally {
@@ -19,14 +18,14 @@ async function createLogin({ user_id, site_id, site_name, login_time, login_loca
   }
 }
 
-async function doLogout({ sessionId, logout_time, logout_location, device_name }) {
+export async function doLogout({ sessionId, logout_time, logout_location, device_name }) {
   const conn = await pool.getConnection();
   try {
     const [result] = await conn.execute(Q.UPDATE_LOGOUT, [
       logout_time,
       logout_location || null,
       device_name || null,
-      sessionId
+      sessionId,
     ]);
     return { affectedRows: result.affectedRows };
   } finally {
@@ -34,7 +33,7 @@ async function doLogout({ sessionId, logout_time, logout_location, device_name }
   }
 }
 
-async function getActiveSessionByUser(user_id) {
+export async function getActiveSessionByUser(user_id) {
   const conn = await pool.getConnection();
   try {
     const [rows] = await conn.execute(Q.GET_ACTIVE_BY_USER, [user_id]);
@@ -44,7 +43,7 @@ async function getActiveSessionByUser(user_id) {
   }
 }
 
-async function getSessionById(id) {
+export async function getSessionById(id) {
   const conn = await pool.getConnection();
   try {
     const [rows] = await conn.execute(Q.GET_BY_ID, [id]);
@@ -54,9 +53,20 @@ async function getSessionById(id) {
   }
 }
 
-module.exports = {
+export async function getAllSessionsByUser(user_id) {
+  const conn = await pool.getConnection();
+  try {
+    const [rows] = await conn.execute(Q.GET_ALL_BY_USER, [user_id]);
+    return rows;
+  } finally {
+    conn.release();
+  }
+}
+
+export default {
   createLogin,
   doLogout,
   getActiveSessionByUser,
-  getSessionById
+  getSessionById,
+  getAllSessionsByUser,
 };
