@@ -1505,6 +1505,7 @@
 //     connection.release();
 //   }
 // };
+
 import pool from "../config/db.js";
 import * as queries from "../constants/nursePreEmploymentQuery.js";
 
@@ -1526,6 +1527,7 @@ const safeParseJSON = (value) => {
   }
 };
 
+// ADD PRE-EMPLOYMENT (1-10 LABORERS)
 export const addPreEmployment = async (req, res) => {
   const { data: dataStr } = req.body || {};
   const heightFiles = req.files?.heightPhobiaImage || [];
@@ -1552,7 +1554,7 @@ export const addPreEmployment = async (req, res) => {
 
   const createdBy = req.user?.username || "admin";
 
-  // FIX: Read from headers first (frontend sends x-user-id, x-site-id)
+  // READ FROM HEADERS FIRST (frontend sends via x-user-id, x-site-id)
   const siteId = req.headers['x-site-id'] || req.cookies?.siteId || null;
   const userId = req.headers['x-user-id'] || req.cookies?.userId || null;
 
@@ -1584,7 +1586,6 @@ export const addPreEmployment = async (req, res) => {
       const newLaborerId = `LAB-PRE-${idNum.toString().padStart(4, "0")}`;
       newLaborerIds.push(newLaborerId);
 
-      // Ensure JSON strings
       const mark1 = typeof laborer.identificationMark1 === "string"
         ? laborer.identificationMark1
         : JSON.stringify(laborer.identificationMark1 || []);
@@ -1635,11 +1636,10 @@ export const addPreEmployment = async (req, res) => {
         laborer.otherHealthInfo || "",
         laborer.otherHealthDetails || "",
         laborer.finalConclusion || "",
-        siteId,   // Position 43
-        userId    // Position 44
+        siteId,   // 43
+        userId    // 44
       ];
 
-      // DEBUG LOG
       console.log(`Inserting laborer ${insertedCount + 1}:`, {
         laborer_id: newLaborerId,
         siteId,
@@ -1669,6 +1669,102 @@ export const addPreEmployment = async (req, res) => {
   }
 };
 
+// GET ALL
+export const getAllPreEmployment = async (req, res) => {
+  try {
+    const siteId = req.cookies?.siteId || null;
+    const userRole = req.user?.role || 'admin';
+    let query = queries.GET_ALL_LABORERS;
+    let params = [];
+
+    if (siteId && userRole !== 'admin') {
+      query = query.replace('ORDER BY created_at DESC', 'WHERE site_id = ? ORDER BY created_at DESC');
+      params = [siteId];
+    }
+
+    const [rows] = await pool.query(query, params);
+    const laborers = rows.map((row) => ({
+      id: row.id,
+      laborer_id: row.laborer_id,
+      created_by: row.created_by,
+      name: row.name,
+      certificate_serial_no: row.certificate_serial_no,
+      date: row.date,
+      parentage: row.parentage,
+      identification_mark1: safeParseJSON(row.identification_mark1),
+      identification_mark2: safeParseJSON(row.identification_mark2),
+      residence: row.residence,
+      date_of_birth: row.date_of_birth,
+      certificate_age: row.certificate_age,
+      reason_for: row.reason_for,
+      height: row.height,
+      weight: row.weight,
+      bmi: row.bmi,
+      body_temp: row.body_temp,
+      near_vision: row.near_vision,
+      far_vision: row.far_vision,
+      bp: row.bp,
+      pulse: row.pulse,
+      systemic: row.systemic,
+      known_case_of_epilepsy: row.known_case_of_epilepsy,
+      frequent_headache: row.frequent_headache,
+      limping_gait: row.limping_gait,
+      physical_deformity: row.physical_deformity,
+      flat_foot: row.flat_foot,
+      mental_depression: row.mental_depression,
+      height_phobia: row.height_phobia,
+      height_phobia_image: row.height_phobia_image,
+      physical_deformity_image: row.physical_deformity_image,
+      sugar_level: row.sugar_level,
+      blood_group: row.blood_group,
+      pallor: row.pallor,
+      lymphadenopathy: row.lymphadenopathy,
+      icterus: row.icterus,
+      cyanosis: row.cyanosis,
+      edema: row.edema,
+      medical_history: row.medical_history,
+      other_health_info: row.other_health_info,
+      other_health_details: row.other_health_details,
+      final_conclusion: row.final_conclusion,
+      status: row.status || 'pending',
+      active: row.active || 'active',
+      site_id: row.site_id,
+      user_id: row.user_id,
+      created_at: row.created_at,
+    }));
+
+    res.json(laborers);
+  } catch (err) {
+    console.error("getAllPreEmployment failed:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET BY ID
+export const getPreEmploymentById = async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ error: "ID is required" });
+
+  try {
+    const [rows] = await pool.query(queries.GET_LABORER_BY_ID, [id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Laborer not found" });
+
+    const laborer = rows[0];
+    laborer.identification_mark1 = laborer.identification_mark1 ? JSON.parse(laborer.identification_mark1) : [];
+    laborer.identification_mark2 = laborer.identification_mark2 ? JSON.parse(laborer.identification_mark2) : [];
+    laborer.status = laborer.status || 'pending';
+    laborer.active = laborer.active || 'active';
+    laborer.site_id = laborer.site_id;
+    laborer.user_id = laborer.user_id;
+
+    res.json(laborer);
+  } catch (err) {
+    console.error("getPreEmploymentById failed:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// UPDATE
 export const updatePreEmployment = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ error: "ID is required" });
@@ -1690,7 +1786,6 @@ export const updatePreEmployment = async (req, res) => {
     return res.status(400).json({ error: "Update supports single laborer data" });
   }
 
-  // FIX: Read from headers first
   const siteId = req.headers['x-site-id'] || req.cookies?.siteId || null;
   const userId = req.headers['x-user-id'] || req.cookies?.userId || null;
 
@@ -1747,12 +1842,11 @@ export const updatePreEmployment = async (req, res) => {
       laborerData.otherHealthInfo || "",
       laborerData.otherHealthDetails || "",
       laborerData.finalConclusion || "",
-      siteId,   // Position 42
-      userId,   // Position 43
+      siteId,   // 42
+      userId,   // 43
       id        // WHERE id = ?
     ];
 
-    // DEBUG LOG
     console.log(`Updating laborer ID: ${id}`, { siteId, userId, valuesLength: values.length });
 
     const [result] = await connection.query(queries.UPDATE_LABORER, values);
@@ -1771,5 +1865,37 @@ export const updatePreEmployment = async (req, res) => {
   }
 };
 
+// DELETE
+export const deletePreEmployment = async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ error: "ID is required" });
+
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+    const [result] = await connection.query(queries.DELETE_LABORER, [id]);
+    if (result.affectedRows === 0) {
+      throw new Error("No laborer found to delete");
+    }
+    await connection.commit();
+    res.json({ message: "Laborer deleted successfully" });
+  } catch (err) {
+    await connection.rollback();
+    console.error("deletePreEmployment failed:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    connection.release();
+  }
+};
+
+// FINAL EXPORT BLOCK — REQUIRED FOR NAMED IMPORTS
+export {
+  addPreEmployment,
+  getAllPreEmployment,
+  getPreEmploymentById,
+  updatePreEmployment,
+  deletePreEmployment
+};
 // getAllPreEmployment, getPreEmploymentById, deletePreEmployment remain unchanged
 // (they already return site_id and user_id correctly)
