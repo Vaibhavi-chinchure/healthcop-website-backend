@@ -1505,7 +1505,6 @@
 //     connection.release();
 //   }
 // };
-
 import pool from "../config/db.js";
 import * as queries from "../constants/nursePreEmploymentQuery.js";
 
@@ -1527,15 +1526,13 @@ const safeParseJSON = (value) => {
   }
 };
 
-// ADD PRE-EMPLOYMENT (1-10 LABORERS)
-export const addPreEmployment = async (req, res) => {
+// ADD PRE-EMPLOYMENT
+const addPreEmployment = async (req, res) => {
   const { data: dataStr } = req.body || {};
   const heightFiles = req.files?.heightPhobiaImage || [];
   const deformityFiles = req.files?.physicalDeformityImage || [];
 
-  if (!dataStr) {
-    return res.status(400).json({ error: "No data provided" });
-  }
+  if (!dataStr) return res.status(400).json({ error: "No data provided" });
 
   let laborersData;
   try {
@@ -1553,8 +1550,6 @@ export const addPreEmployment = async (req, res) => {
   }
 
   const createdBy = req.user?.username || "admin";
-
-  // READ FROM HEADERS FIRST (frontend sends via x-user-id, x-site-id)
   const siteId = req.headers['x-site-id'] || req.cookies?.siteId || null;
   const userId = req.headers['x-user-id'] || req.cookies?.userId || null;
 
@@ -1563,7 +1558,6 @@ export const addPreEmployment = async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // Generate next laborer ID
     const [lastRecord] = await connection.query(`
       SELECT laborer_id FROM nurse_pre_employment WHERE laborer_id LIKE 'LAB-PRE-%'
       ORDER BY CAST(SUBSTRING(laborer_id, 9) AS UNSIGNED) DESC LIMIT 1
@@ -1594,69 +1588,34 @@ export const addPreEmployment = async (req, res) => {
         : JSON.stringify(laborer.identificationMark2 || []);
 
       const values = [
-        newLaborerId,
-        createdBy,
-        laborer.name || "",
-        laborer.certificateSerialNo || "",
-        formatDate(laborer.date),
-        laborer.parentage || "",
-        mark1,
-        mark2,
-        laborer.sex || "",
-        laborer.residence || "",
-        formatDate(laborer.dateOfBirth),
+        newLaborerId, createdBy, laborer.name || "", laborer.certificateSerialNo || "",
+        formatDate(laborer.date), laborer.parentage || "", mark1, mark2,
+        laborer.sex || "", laborer.residence || "", formatDate(laborer.dateOfBirth),
         laborer.certificateAge ? parseInt(laborer.certificateAge, 10) : null,
-        laborer.reasonFor || "",
-        laborer.height ? parseFloat(laborer.height) : null,
-        laborer.weight ? parseFloat(laborer.weight) : null,
-        laborer.bmi ? parseFloat(laborer.bmi) : null,
-        laborer.bodyTemp ? parseFloat(laborer.bodyTemp) : null,
-        laborer.nearVision || "",
-        laborer.farVision || "",
-        laborer.bp || "",
-        laborer.pulse ? parseInt(laborer.pulse, 10) : null,
-        laborer.systemic || "",
-        laborer.knownCaseOfEpilepsy || "",
-        laborer.frequentHeadache || "",
-        laborer.limpingGait || "",
-        laborer.physicalDeformity || "",
-        laborer.flatFoot || "",
-        laborer.mentalDepression || "",
-        laborer.heightPhobia || "",
+        laborer.reasonFor || "", laborer.height ? parseFloat(laborer.height) : null,
+        laborer.weight ? parseFloat(laborer.weight) : null, laborer.bmi ? parseFloat(laborer.bmi) : null,
+        laborer.bodyTemp ? parseFloat(laborer.bodyTemp) : null, laborer.nearVision || "",
+        laborer.farVision || "", laborer.bp || "", laborer.pulse ? parseInt(laborer.pulse, 10) : null,
+        laborer.systemic || "", laborer.knownCaseOfEpilepsy || "", laborer.frequentHeadache || "",
+        laborer.limpingGait || "", laborer.physicalDeformity || "", laborer.flatFoot || "",
+        laborer.mentalDepression || "", laborer.heightPhobia || "",
         heightFiles[insertedCount] ? heightFiles[insertedCount].filename : null,
         deformityFiles[insertedCount] ? deformityFiles[insertedCount].filename : null,
-        laborer.sugarLevel ? parseFloat(laborer.sugarLevel) : null,
-        laborer.bloodGroup || "",
-        laborer.pallor || "No",
-        laborer.lymphadenopathy || "No",
-        laborer.icterus || "No",
-        laborer.cyanosis || "No",
-        laborer.edema || "No",
-        laborer.medicalHistory || "",
-        laborer.otherHealthInfo || "",
-        laborer.otherHealthDetails || "",
-        laborer.finalConclusion || "",
-        siteId,   // 43
-        userId    // 44
+        laborer.sugarLevel ? parseFloat(laborer.sugarLevel) : null, laborer.bloodGroup || "",
+        laborer.pallor || "No", laborer.lymphadenopathy || "No", laborer.icterus || "No",
+        laborer.cyanosis || "No", laborer.edema || "No", laborer.medicalHistory || "",
+        laborer.otherHealthInfo || "", laborer.otherHealthDetails || "", laborer.finalConclusion || "",
+        siteId, userId
       ];
 
-      console.log(`Inserting laborer ${insertedCount + 1}:`, {
-        laborer_id: newLaborerId,
-        siteId,
-        userId,
-        valuesLength: values.length
-      });
+      console.log(`Inserting laborer ${insertedCount + 1}:`, { laborer_id: newLaborerId, siteId, userId });
 
       const [result] = await connection.query(queries.INSERT_LABORER, values);
-      if (result.affectedRows === 0) {
-        throw new Error(`Failed to insert laborer ${insertedCount + 1}`);
-      }
+      if (result.affectedRows === 0) throw new Error(`Failed to insert laborer ${insertedCount + 1}`);
       insertedCount++;
     }
 
-    if (insertedCount === 0) {
-      throw new Error("No valid laborers to insert");
-    }
+    if (insertedCount === 0) throw new Error("No valid laborers to insert");
 
     await connection.commit();
     res.json({ message: `${insertedCount} laborers added successfully`, laborer_ids: newLaborerIds });
@@ -1670,7 +1629,7 @@ export const addPreEmployment = async (req, res) => {
 };
 
 // GET ALL
-export const getAllPreEmployment = async (req, res) => {
+const getAllPreEmployment = async (req, res) => {
   try {
     const siteId = req.cookies?.siteId || null;
     const userRole = req.user?.role || 'admin';
@@ -1683,54 +1642,12 @@ export const getAllPreEmployment = async (req, res) => {
     }
 
     const [rows] = await pool.query(query, params);
-    const laborers = rows.map((row) => ({
-      id: row.id,
-      laborer_id: row.laborer_id,
-      created_by: row.created_by,
-      name: row.name,
-      certificate_serial_no: row.certificate_serial_no,
-      date: row.date,
-      parentage: row.parentage,
+    const laborers = rows.map(row => ({
+      ...row,
       identification_mark1: safeParseJSON(row.identification_mark1),
       identification_mark2: safeParseJSON(row.identification_mark2),
-      residence: row.residence,
-      date_of_birth: row.date_of_birth,
-      certificate_age: row.certificate_age,
-      reason_for: row.reason_for,
-      height: row.height,
-      weight: row.weight,
-      bmi: row.bmi,
-      body_temp: row.body_temp,
-      near_vision: row.near_vision,
-      far_vision: row.far_vision,
-      bp: row.bp,
-      pulse: row.pulse,
-      systemic: row.systemic,
-      known_case_of_epilepsy: row.known_case_of_epilepsy,
-      frequent_headache: row.frequent_headache,
-      limping_gait: row.limping_gait,
-      physical_deformity: row.physical_deformity,
-      flat_foot: row.flat_foot,
-      mental_depression: row.mental_depression,
-      height_phobia: row.height_phobia,
-      height_phobia_image: row.height_phobia_image,
-      physical_deformity_image: row.physical_deformity_image,
-      sugar_level: row.sugar_level,
-      blood_group: row.blood_group,
-      pallor: row.pallor,
-      lymphadenopathy: row.lymphadenopathy,
-      icterus: row.icterus,
-      cyanosis: row.cyanosis,
-      edema: row.edema,
-      medical_history: row.medical_history,
-      other_health_info: row.other_health_info,
-      other_health_details: row.other_health_details,
-      final_conclusion: row.final_conclusion,
       status: row.status || 'pending',
-      active: row.active || 'active',
-      site_id: row.site_id,
-      user_id: row.user_id,
-      created_at: row.created_at,
+      active: row.active || 'active'
     }));
 
     res.json(laborers);
@@ -1741,7 +1658,7 @@ export const getAllPreEmployment = async (req, res) => {
 };
 
 // GET BY ID
-export const getPreEmploymentById = async (req, res) => {
+const getPreEmploymentById = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ error: "ID is required" });
 
@@ -1750,12 +1667,10 @@ export const getPreEmploymentById = async (req, res) => {
     if (rows.length === 0) return res.status(404).json({ error: "Laborer not found" });
 
     const laborer = rows[0];
-    laborer.identification_mark1 = laborer.identification_mark1 ? JSON.parse(laborer.identification_mark1) : [];
-    laborer.identification_mark2 = laborer.identification_mark2 ? JSON.parse(laborer.identification_mark2) : [];
+    laborer.identification_mark1 = safeParseJSON(laborer.identification_mark1);
+    laborer.identification_mark2 = safeParseJSON(laborer.identification_mark2);
     laborer.status = laborer.status || 'pending';
     laborer.active = laborer.active || 'active';
-    laborer.site_id = laborer.site_id;
-    laborer.user_id = laborer.user_id;
 
     res.json(laborer);
   } catch (err) {
@@ -1764,8 +1679,8 @@ export const getPreEmploymentById = async (req, res) => {
   }
 };
 
-// UPDATE
-export const updatePreEmployment = async (req, res) => {
+// UPDATE — REMOVED `export const`
+const updatePreEmployment = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ error: "ID is required" });
 
@@ -1802,57 +1717,28 @@ export const updatePreEmployment = async (req, res) => {
       : JSON.stringify(laborerData.identificationMark2 || []);
 
     const values = [
-      laborerData.name || "",
-      laborerData.certificateSerialNo || "",
-      formatDate(laborerData.date),
-      laborerData.parentage || "",
-      mark1,
-      mark2,
-      laborerData.sex || "",
-      laborerData.residence || "",
-      formatDate(laborerData.dateOfBirth),
-      laborerData.certificateAge ? parseInt(laborerData.certificateAge, 10) : null,
-      laborerData.reasonFor || "",
-      laborerData.height ? parseFloat(laborerData.height) : null,
-      laborerData.weight ? parseFloat(laborerData.weight) : null,
-      laborerData.bmi ? parseFloat(laborerData.bmi) : null,
-      laborerData.bodyTemp ? parseFloat(laborerData.bodyTemp) : null,
-      laborerData.nearVision || "",
-      laborerData.farVision || "",
-      laborerData.bp || "",
-      laborerData.pulse ? parseInt(laborerData.pulse, 10) : null,
-      laborerData.systemic || "",
-      laborerData.knownCaseOfEpilepsy || "",
-      laborerData.frequentHeadache || "",
-      laborerData.limpingGait || "",
-      laborerData.physicalDeformity || "",
-      laborerData.flatFoot || "",
-      laborerData.mentalDepression || "",
-      laborerData.heightPhobia || "",
-      heightFile ? heightFile.filename : null,
-      deformityFile ? deformityFile.filename : null,
-      laborerData.sugarLevel ? parseFloat(laborerData.sugarLevel) : null,
-      laborerData.bloodGroup || "",
-      laborerData.pallor || "No",
-      laborerData.lymphadenopathy || "No",
-      laborerData.icterus || "No",
-      laborerData.cyanosis || "No",
-      laborerData.edema || "No",
-      laborerData.medicalHistory || "",
-      laborerData.otherHealthInfo || "",
-      laborerData.otherHealthDetails || "",
-      laborerData.finalConclusion || "",
-      siteId,   // 42
-      userId,   // 43
-      id        // WHERE id = ?
+      laborerData.name || "", laborerData.certificateSerialNo || "", formatDate(laborerData.date),
+      laborerData.parentage || "", mark1, mark2, laborerData.sex || "", laborerData.residence || "",
+      formatDate(laborerData.dateOfBirth), laborerData.certificateAge ? parseInt(laborerData.certificateAge, 10) : null,
+      laborerData.reasonFor || "", laborerData.height ? parseFloat(laborerData.height) : null,
+      laborerData.weight ? parseFloat(laborerData.weight) : null, laborerData.bmi ? parseFloat(laborerData.bmi) : null,
+      laborerData.bodyTemp ? parseFloat(laborerData.bodyTemp) : null, laborerData.nearVision || "",
+      laborerData.farVision || "", laborerData.bp || "", laborerData.pulse ? parseInt(laborerData.pulse, 10) : null,
+      laborerData.systemic || "", laborerData.knownCaseOfEpilepsy || "", laborerData.frequentHeadache || "",
+      laborerData.limpingGait || "", laborerData.physicalDeformity || "", laborerData.flatFoot || "",
+      laborerData.mentalDepression || "", laborerData.heightPhobia || "",
+      heightFile ? heightFile.filename : null, deformityFile ? deformityFile.filename : null,
+      laborerData.sugarLevel ? parseFloat(laborerData.sugarLevel) : null, laborerData.bloodGroup || "",
+      laborerData.pallor || "No", laborerData.lymphadenopathy || "No", laborerData.icterus || "No",
+      laborerData.cyanosis || "No", laborerData.edema || "No", laborerData.medicalHistory || "",
+      laborerData.otherHealthInfo || "", laborerData.otherHealthDetails || "", laborerData.finalConclusion || "",
+      siteId, userId, id
     ];
 
-    console.log(`Updating laborer ID: ${id}`, { siteId, userId, valuesLength: values.length });
+    console.log(`Updating laborer ID: ${id}`, { siteId, userId });
 
     const [result] = await connection.query(queries.UPDATE_LABORER, values);
-    if (result.affectedRows === 0) {
-      throw new Error("No laborer found to update");
-    }
+    if (result.affectedRows === 0) throw new Error("No laborer found to update");
 
     await connection.commit();
     res.json({ message: "Laborer updated successfully" });
@@ -1866,7 +1752,7 @@ export const updatePreEmployment = async (req, res) => {
 };
 
 // DELETE
-export const deletePreEmployment = async (req, res) => {
+const deletePreEmployment = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ error: "ID is required" });
 
@@ -1875,9 +1761,7 @@ export const deletePreEmployment = async (req, res) => {
   try {
     await connection.beginTransaction();
     const [result] = await connection.query(queries.DELETE_LABORER, [id]);
-    if (result.affectedRows === 0) {
-      throw new Error("No laborer found to delete");
-    }
+    if (result.affectedRows === 0) throw new Error("No laborer found to delete");
     await connection.commit();
     res.json({ message: "Laborer deleted successfully" });
   } catch (err) {
@@ -1889,7 +1773,7 @@ export const deletePreEmployment = async (req, res) => {
   }
 };
 
-// FINAL EXPORT BLOCK — REQUIRED FOR NAMED IMPORTS
+// SINGLE EXPORT BLOCK
 export {
   addPreEmployment,
   getAllPreEmployment,
@@ -1897,5 +1781,3 @@ export {
   updatePreEmployment,
   deletePreEmployment
 };
-// getAllPreEmployment, getPreEmploymentById, deletePreEmployment remain unchanged
-// (they already return site_id and user_id correctly)
