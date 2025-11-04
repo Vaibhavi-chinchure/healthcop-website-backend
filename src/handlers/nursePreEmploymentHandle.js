@@ -1172,8 +1172,8 @@ export const addPreEmployment = async (req, res) => {
   }
   const createdBy = req.user?.username || "admin";
   // Match frontend cookie names: "siteId" and "userId"
-  const siteId = req.cookies?.siteId || null;
-  const userId = req.cookies?.userId || null;
+ const siteId = req.headers['x-site-id'] || req.cookies?.siteId || null;
+  const userId = req.headers['x-user-id'] || req.cookies?.userId || null;
 
   const connection = await pool.getConnection();
   try {
@@ -1400,8 +1400,8 @@ export const updatePreEmployment = async (req, res) => {
   }
 
   // Match frontend cookie names
-  const siteId = req.cookies?.siteId || null;
-  const userId = req.cookies?.userId || null;
+ const siteId = req.headers['x-site-id'] || req.cookies?.siteId || null;
+  const userId = req.headers['x-user-id'] || req.cookies?.userId || null;
 
   const connection = await pool.getConnection();
   try {
